@@ -62,7 +62,7 @@ else
     SPECS = --specs=nosys.specs
     CC = arm-none-eabi-gcc
     LD =
-    LDFLAGS = -Wl,-Map=$(BASENAME).map
+LDFLAGS = -Wl,-Map=$(BASENAME).map -L ../
     CFLAGS = $(COMM_CFLAGS) $(CPU) $(ARCH) $(SPECS)
     CPPFLAGS = $(INCLUDES) -D$(PLATFORM) $(DEPFLAGS) -nostartfiles
     # Architectures Specific Flags
