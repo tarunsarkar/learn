@@ -53,17 +53,17 @@ ifeq ($(PLATFORM),HOST)
 else
     SOURCES = $(MSP432_SOURCES)
     INCLUDES = $(MSP432_INCLUDES)
-    CPU = -mcpu=cortex-m4
+    CPU = cortex-m4
     ARCH = -mthumb \
         -march=armv7e-m \
         -mfloat-abi=soft \
         -mfpu=vfpv4-d16
 
-    SPECS = --specs=nosys.specs
+    SPECS = nosys.specs
     CC = arm-none-eabi-gcc
     LD =
-LDFLAGS = -Wl,-Map=$(BASENAME).map -L ../
-    CFLAGS = $(COMM_CFLAGS) $(CPU) $(ARCH) $(SPECS)
+    LDFLAGS = -Wl,-Map=$(BASENAME).map -L ../
+    CFLAGS = $(COMM_CFLAGS) -mcpu=$(CPU) $(ARCH) --specs=$(SPECS)
     CPPFLAGS = $(INCLUDES) -D$(PLATFORM) $(DEPFLAGS) -nostartfiles
     # Architectures Specific Flags
     LINKER_FILE = -T msp432p401r.lds
