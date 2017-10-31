@@ -33,6 +33,13 @@ $(shell mkdir -p $(DEPDIR) >/dev/null)
 DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.Td
 POSTCOMPILE = @mv -f $(DEPDIR)/$*.Td $(DEPDIR)/$*.d && touch $@
 
+COMM_CFLAGS = -Wall \
+     -Werror \
+     -g \
+     -O0 \
+     -std=c99
+
+
 ifeq ($(PLATFORM),HOST)
     SOURCES = $(HOST_SOURCES)
     INCLUDES = $(HOST_INCLUDES)
@@ -40,26 +47,26 @@ ifeq ($(PLATFORM),HOST)
     CC = gcc
     LD =
     LDFLAGS = -Wl,-Map=$(BASENAME).map
-    CFLAGS = -Wall -Werror -g -O0 -std=c99
+    CFLAGS = $(COMM_CFLAGS)
     CPPFLAGS = $(INCLUDES) -D$(PLATFORM) $(DEPFLAGS)
-    # Architectures Specific Flags
     LINKER_FILE =
-    CPU =
-    ARCH =
-    SPECS =
 else
     SOURCES = $(MSP432_SOURCES)
     INCLUDES = $(MSP432_INCLUDES)
+    CPU = -mcpu=cortex-m4
+    ARCH = -mthumb \
+        -march=armv7e-m \
+        -mfloat-abi=soft \
+        -mfpu=vfpv4-d16
+
+    SPECS = --specs=nosys.specs
     CC = arm-none-eabi-gcc
     LD =
-    LDFLAGS = -T msp432p401r.lds -Wl,-Map=$(BASENAME).map
-    CFLAGS = -Wall -Werror -g -O0 -std=c99 -mcpu=cortex-m4 -mthumb -march=armv7e-m -mfloat-abi=hard -mfpu=fpv4-sp-d16 --specs=nosys.specs
-    CPPFLAGS = $(INCLUDES) -D$(PLATFORM) $(DEPFLAGS)
+    LDFLAGS = -Wl,-Map=$(BASENAME).map
+    CFLAGS = $(COMM_CFLAGS) $(CPU) $(ARCH) $(SPECS)
+    CPPFLAGS = $(INCLUDES) -D$(PLATFORM) $(DEPFLAGS) -nostartfiles
     # Architectures Specific Flags
-    LINKER_FILE =
-    CPU =
-    ARCH =
-    SPECS =
+    LINKER_FILE = -T msp432p401r.lds
 endif
 
 PREPS = $(SOURCES:.c=.i)
@@ -93,7 +100,7 @@ asm-all: $(ASMS)
 build: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(OBJS) $(CFLAGS) $(LDFLAGS) -o $@
+	$(CC) $(OBJS) $(CFLAGS) $(LINKER_FILE) $(LDFLAGS) -o $@
 
 $(DEPDIR)/%.d: ;
 .PRECIOUS: $(DEPDIR)/%.d
