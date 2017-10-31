@@ -77,10 +77,10 @@ ASMS = $(SOURCES:.c=.asm)
 	$(CC) -E $< $(CPPFLAGS) -o $@
 
 %.o: %.i
-	$(CC) -c $< $(CPPFLAGS) -o $@
+	$(CC) -c $< $(CPPFLAGS) $(CFLAGS) -o $@
 
 %.asm: %.i
-	$(CC) -S $< $(CPPFLAGS) -o $@
+	$(CC) -S $< $(CPPFLAGS) $(CFLAGS) -o $@
 
 .PHONY: prep-all
 prep-all: $(PREPS)
@@ -89,7 +89,7 @@ prep-all: $(PREPS)
 compile-all: $(OBJS)
 %.o: %.c
 %.o: %.c $(DEPDIR)/%.d
-	$(CC) -c $< $(CPPFLAGS) -o $@
+	$(CC) -c $< $(CPPFLAGS) $(CFLAGS) -o $@
 	$(POSTCOMPILE)
 
 
